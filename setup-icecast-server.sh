@@ -210,7 +210,7 @@ start() {
 }
 stop() {
         echo "Shutting down ices2: "
-        kill -9 `pidof ices2`
+        kill -9 \`pidof ices2\`
         echo "done."
 }
  
