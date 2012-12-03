@@ -121,7 +121,6 @@ export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 clear
 check_sanity
 
-function boo {
 
 echo "Installing icecast"
 check_install icecast2 icecast2
@@ -196,7 +195,6 @@ END
 chown $ICES2_USER:$ICES2_USER /home/$ICES2_USER/playlist.txt
 
 
-}
 
 echo "create ices2 daemon for autostart"
     cat >  /etc/init.d/ices2 <<END
