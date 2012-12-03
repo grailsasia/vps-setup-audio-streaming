@@ -5,6 +5,16 @@
 #  This is a simple VPS setup for icecast audio streaming server.
 #     should/could work on debian 6 and ubuntu 10.04 to 12.04 
 #
+#  This will install icecast server where you listeners will connect to
+#  This will also install ices2, where it repeteadly loops a list of ogg music 
+#    files which are fed to your icecast2 server.
+#  
+#  If you did not change anything in the config below, you can go to this
+#     url to listen: http://your_ip_add:8999/radio.ogg
+#
+#  To manage the files, upload to /home/radio/music and edit the file
+#     /home/radio/playlist.txt
+#
 ###############################################################################
 
 
