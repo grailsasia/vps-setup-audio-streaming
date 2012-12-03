@@ -12,15 +12,35 @@
 # Parameters - please set accordingly to desired values 
 ###############################################################################
 
+# Port where Icecast will listen
 ICECAST_PORT=8999
+
+# Mount Name
+MOUNT_NAME=radio.ogg
+
+# Stream Name
+STREAM_NAME=My Radio
+
+# Stream Genre
+STREAM_GENRE=Pop
+
+# Stream Description
+STREAM_DESC=Listen Now
+
+# Icecast Source password
 ICECAST_SOURCE_PASSWORD=Ice123456
+
+# Icecast Relay password
 ICECAST_RELAY_PASSWORD=Ice123456
+
+# Icecast Admin password
 ICECAST_ADMIN_PASSWORD=Ice123456
 
+# Ices2 unix user to put config, logs, and music files into
 ICES2_USER=radio
-ICES2_USER_PWD=radio
 
-MOUNT_NAME=radio.ogg
+# Ices2 unix user password
+ICES2_USER_PWD=radio
 
 ###############################################################################
 # Common functions
@@ -112,7 +132,8 @@ useradd $ICES2_USER -d /home/$ICES2_USER -m -p $ICES2_USER_PWD
 mkdir /home/$ICES2_USER/logs
 mkdir /home/$ICES2_USER/music
 echo "download sample music"
-wget http://upload.wikimedia.org/wikipedia/en/0/04/Rayman_2_music_sample.ogg -O /home/$ICES2_USER/music/sample.ogg 
+wget http://upload.wikimedia.org/wikipedia/en/0/04/Rayman_2_music_sample.ogg -O /home/$ICES2_USER/music/sample1.ogg 
+wget http://upload.wikimedia.org/wikipedia/en/0/06/Elliott_Smith_-_Son_of_Sam_%28sample%29.ogg -O /home/$ICES2_USER/music/sample2.ogg
 chown $ICES2_USER:$ICES2_USER -R /home/$ICES2_USER/logs 
 chown $ICES2_USER:$ICES2_USER -R /home/$ICES2_USER/music
 
@@ -127,9 +148,9 @@ echo "Setup of ices2 config files"
     <consolelog>0</consolelog>
     <stream>
         <metadata>
-            <name>My Radio</name>
-            <genre>My Genre</genre>
-            <description>Listen</description>
+            <name>$STREAM_NAME</name>
+            <genre>$STREAM_GENRE</genre>
+            <description>$STREAM_DESC</description>
         </metadata>
         <input>
             <module>playlist</module>
@@ -159,11 +180,55 @@ END
 chown $ICES2_USER:$ICES2_USER /home/$ICES2_USER/playlist.xml
 
     cat > /home/$ICES2_USER/playlist.txt <<END
-/home/$ICES2_USER/music/sample.ogg
+/home/$ICES2_USER/music/sample1.ogg
+/home/$ICES2_USER/music/sample2.ogg
 END
 chown $ICES2_USER:$ICES2_USER /home/$ICES2_USER/playlist.txt
 
+
 }
+
+echo "create ices2 daemon for autostart"
+    cat >  /etc/init.d/ices2 <<END
+#!/bin/bash
+# /etc/init.d/ices2
+
+start() {
+        echo "Starting ices2: "
+        su - $ICES2_USER -c "ices2 /home/$ICES2_USER/playlist.xml"
+        echo "done."
+}
+stop() {
+        echo "Shutting down ices2: "
+        kill -9 `pidof ices2`
+        echo "done."
+}
+ 
+case "\$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        sleep 30
+        start
+        ;;
+  *)
+        echo "Usage: \$0 {start|stop|restart}"
+esac
+exit 0
+END
+
+echo "Initialize ices2 daemon"
+sudo chmod 755 /etc/init.d/ices2
+sudo update-rc.d ices2 defaults
+
+echo "Start daemons"
+service icecast2 start
+service ices2 start
 
 
 echo "Done"
